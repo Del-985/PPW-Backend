@@ -33,7 +33,7 @@ try {
     
   }
   
-    
+/*    
     // Send email notification
     const mailOptions = {
       from: `"${name}" <${email}>`,
@@ -47,6 +47,7 @@ try {
     res.status(200).json({ success: true, message: 'Message received and email sent.' });
   } catch (err) {
     console.error('Error in contact form submission:', err);
+  */
     res.status(500).json({ error: 'Internal server error.' });
   }
 };
