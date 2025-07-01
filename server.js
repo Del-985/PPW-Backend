@@ -1,28 +1,22 @@
-// backend/server.js
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const contactRoutes = require('./routes/contactRoutes');
-const db = require('./config/db');
-
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-app.use('/contact', contactRoutes);
+// Routes
+const contactRoutes = require('./routes/contactRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
-// Test database connection on startup
-(async () => {
-  try {
-    const res = await db.query('SELECT NOW()');
-    console.log('Database connected:', res.rows[0]);
-  } catch (err) {
-    console.error('Database connection error:', err);
-  }
-})();
+app.use('/api', contactRoutes);
+app.use('/api/admin', adminRoutes);
 
-const PORT = process.env.PORT || 3000;
+// Start Server
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Backend running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
