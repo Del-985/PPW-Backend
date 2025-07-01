@@ -42,7 +42,7 @@ try {
       text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`
     };
 
-    await transporter.sendMail(mailOptions);
+   // await transporter.sendMail(mailOptions);
 
     res.status(200).json({ success: true, message: 'Message received and email sent.' });
   } catch (err) {
