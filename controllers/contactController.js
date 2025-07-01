@@ -18,13 +18,22 @@ const handleContactForm = async (req, res) => {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
-  try {
+ 
+try {
     // Store form submission in the database
     await pool.query(
       'INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)',
       [name, email, message]
     );
 
+  catch (err) {
+    console.error('DB INSERT failed:', err.stack || err);
+    res.status(500).json({error:'Database error.'});
+}
+    
+  }
+  
+    
     // Send email notification
     const mailOptions = {
       from: `"${name}" <${email}>`,
