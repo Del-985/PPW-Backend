@@ -26,7 +26,7 @@ try {
       [name, email, message]
     );
 
-  catch (err) {
+  catch {
     console.error('DB INSERT failed:', err.stack || err);
     res.status(500).json({error:'Database error.'});
 }
