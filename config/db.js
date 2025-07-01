@@ -9,3 +9,5 @@ const pool = new Pool({
 });
 
 module.exports = pool;
+
+console.log('Connected to DB');
