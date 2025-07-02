@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const registerBusinessUser = async (req, res) => {
   const { business_name, email, password } = req.body;
