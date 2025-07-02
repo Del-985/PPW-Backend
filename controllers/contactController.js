@@ -7,17 +7,50 @@ const transporter = nodemailer.createTransport({
   port: parseInt(process.env.SMTP_PORT) || 465,
   secure: true, // true for port 465 (SSL)
   auth: {
-    user: process.env.SMTP_USER, // admin@pioneerwashandlandscape.com
-    pass: process.env.SMTP_PASS  // actual password or app password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   }
 });
 
+// Escape basic HTML characters
+const escapeHTML = (str) =>
+  str.replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+
+// Email format validation
+const isValidEmail = (email) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 // Main handler
 const handleContactForm = async (req, res) => {
-  const { name, email, message } = req.body;
+  let { name, email, message } = req.body;
 
+  // Fallbacks to prevent undefined values
+  name = (name || '').trim();
+  email = (email || '').trim();
+  message = (message || '').trim();
+
+  // Sanitize inputs
+  name = escapeHTML(name);
+  email = escapeHTML(email);
+  message = escapeHTML(message);
+
+  // Validate fields
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format.' });
+  }
+
+  if (name.length > 100 || message.length > 2000) {
+    return res.status(400).json({ error: 'Input exceeds allowed length.' });
   }
 
   try {
@@ -31,9 +64,10 @@ const handleContactForm = async (req, res) => {
     try {
       const mailOptions = {
         from: `"${name}" <${process.env.SMTP_USER}>`,
-        to: process.env.ADMIN_EMAIL,  // e.g., your personal inbox
+        to: process.env.ADMIN_EMAIL,
         subject: 'New Contact Form Submission',
-        text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`
+        text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
+        replyTo: email
       };
 
       await transporter.sendMail(mailOptions);
