@@ -3,5 +3,7 @@ const router = express.Router();
 const { registerBusinessUser } = require('../controllers/businessController');
 
 router.post('/register', registerBusinessUser);
+router.post('/login', loginBusinessUser);
+
 
 module.exports = router;
