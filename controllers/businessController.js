@@ -53,9 +53,21 @@ const loginBusinessUser = async (req, res) => {
   }
 };
 
+// ✅ Add contact viewing route for dashboard
+const getBusinessContacts = async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM contacts ORDER BY submitted_at DESC'
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching business contacts:', err);
+    res.status(500).json({ error: 'Failed to fetch contacts.' });
+  }
+};
 
 module.exports = {
   registerBusinessUser,
-  loginBusinessUser
+  loginBusinessUser,
+  getBusinessContacts
 };
-
