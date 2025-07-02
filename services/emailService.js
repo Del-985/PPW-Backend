@@ -2,21 +2,23 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.office365.com',
-  port: 587,
-  secure: false,
+  host: process.env.SMTP_HOST || 'smtp.zoho.com',
+  port: parseInt(process.env.SMTP_PORT) || 465,
+  secure: true, // Required for SSL on port 465
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.SMTP_USER, // admin@pioneerwashandlandscape.com
+    pass: process.env.SMTP_PASS, // App password or login password
   },
 });
 
 exports.sendEmail = (name, email, message) => {
   const mailOptions = {
-    from: `"${name}" <${email}>`,
-    to: process.env.EMAIL_USER,
+    from: `"${name}" <${process.env.SMTP_USER}>`,  // Use verified domain sender
+    to: process.env.ADMIN_EMAIL,                   // Where contact emails go
     subject: 'New Contact Form Submission',
     text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
+    replyTo: email, // Optional: allows reply directly to user's address
   };
+
   return transporter.sendMail(mailOptions);
 };
