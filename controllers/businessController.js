@@ -23,4 +23,39 @@ const registerBusinessUser = async (req, res) => {
   }
 };
 
-module.exports = { registerBusinessUser };
+const loginBusinessUser = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM business_users WHERE email = $1',
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password_hash);
+
+    if (!match) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Login successful.' });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+
+module.exports = {
+  registerBusinessUser,
+  loginBusinessUser
+};
+
