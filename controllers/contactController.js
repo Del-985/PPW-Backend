@@ -1,14 +1,14 @@
 const pool = require('../config/db');
 const nodemailer = require('nodemailer');
 
-// Configure mail transport
+// Configure mail transport for Zoho SMTP
 const transporter = nodemailer.createTransport({
-  host: 'smtp.your-email-provider.com', // Replace with actual SMTP host
-  port: 587,
-  secure: false,
+  host: process.env.SMTP_HOST || 'smtp.zoho.com',
+  port: parseInt(process.env.SMTP_PORT) || 465,
+  secure: true, // true for port 465 (SSL)
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.SMTP_USER, // admin@pioneerwashandlandscape.com
+    pass: process.env.SMTP_PASS  // actual password or app password
   }
 });
 
@@ -21,17 +21,17 @@ const handleContactForm = async (req, res) => {
   }
 
   try {
-    // Store form submission in the database
+    // Store contact form in database
     await pool.query(
       'INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)',
       [name, email, message]
     );
 
-    // Send email notification (optional)
+    // Send email to admin
     try {
       const mailOptions = {
-        from: `"${name}" <${email}>`,
-        to: process.env.EMAIL_RECEIVER,
+        from: `"${name}" <${process.env.SMTP_USER}>`,
+        to: process.env.ADMIN_EMAIL,  // e.g., your personal inbox
         subject: 'New Contact Form Submission',
         text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`
       };
@@ -40,7 +40,6 @@ const handleContactForm = async (req, res) => {
       console.log('✅ Email sent');
     } catch (emailErr) {
       console.error('❌ Email failed:', emailErr.stack || emailErr.message);
-      // Do not block success if email fails
     }
 
     res.status(200).json({ success: true, message: 'Message received and stored.' });
