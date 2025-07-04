@@ -11,13 +11,26 @@ const registerBusinessUser = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const result = await pool.query(
       'INSERT INTO business_users (business_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
       [business_name, email, hashedPassword]
     );
 
     res.status(201).json({ success: true, userId: result.rows[0].id });
+
   } catch (err) {
+    if (err.code === '23505') {
+      // Unique violation
+      if (err.detail.includes('email')) {
+        return res.status(409).json({ error: 'Email is already registered.' });
+      }
+      if (err.detail.includes('business_name')) {
+        return res.status(409).json({ error: 'Business name is already registered.' });
+      }
+      return res.status(409).json({ error: 'Duplicate registration.' });
+    }
+
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Registration failed.' });
   }
