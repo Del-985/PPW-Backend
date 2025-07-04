@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 
+// Register business user
 const registerBusinessUser = async (req, res) => {
   const { business_name, email, password } = req.body;
 
@@ -10,7 +11,6 @@ const registerBusinessUser = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const result = await pool.query(
       'INSERT INTO business_users (business_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
       [business_name, email, hashedPassword]
@@ -23,8 +23,10 @@ const registerBusinessUser = async (req, res) => {
   }
 };
 
+// Login business user
 const loginBusinessUser = async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
@@ -53,7 +55,7 @@ const loginBusinessUser = async (req, res) => {
   }
 };
 
-// ✅ Add contact viewing route for dashboard
+// View contact submissions for dashboard
 const getBusinessContacts = async (req, res) => {
   try {
     const result = await pool.query(
