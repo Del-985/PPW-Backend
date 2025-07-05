@@ -7,6 +7,9 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 
 // Routes
 const contactRoutes = require('./routes/contactRoutes');
