@@ -1,15 +1,17 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://pioneerwashandlandscape.com', // Adjust as needed
+  credentials: true
+}));
 app.use(express.json());
-const cookieParser = require('cookie-parser');
 app.use(cookieParser());
-
 
 // Routes
 const contactRoutes = require('./routes/contactRoutes');
@@ -19,6 +21,11 @@ const businessRoutes = require('./routes/businessRoutes');
 app.use('/api', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/business', businessRoutes);
+
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
 // Start Server
 const PORT = process.env.PORT || 5000;
