@@ -46,11 +46,16 @@ const loginBusinessUser = async (req, res) => {
     }
 
     // ✅ Generate JWT
-    const token = jwt.sign(
-      { userId: user.id, businessName: user.business_name },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
-    );
+  const token = jwt.sign(
+  {
+    userId: user.id,
+    businessName: user.business_name,
+    is_admin: user.is_admin // Include admin flag in token
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
+);
+
 
    res.cookie('token', token, {
   httpOnly: true,
