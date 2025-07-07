@@ -7,12 +7,14 @@ const {
   deleteContact
 } = require('../controllers/adminController');
 
-const verifyToken = require('../middleware/auth'); // JWT middleware
+const verifyToken = require('../middleware/auth');
+const adminOnly = require('../middleware/adminOnly'); // 🔒
 
-// Protect all admin routes with verifyToken
-router.get('/contacts', verifyToken, getAllContacts);
-router.get('/business-users', verifyToken, getAllBusinessUsers);
-router.delete('/business-user/:id', verifyToken, deleteBusinessUser);
-router.delete('/contact/:id', verifyToken, deleteContact);
+router.use(verifyToken, adminOnly); // Protect all admin routes
+
+router.get('/contacts', getAllContacts);
+router.get('/business-users', getAllBusinessUsers);
+router.delete('/business-user/:id', deleteBusinessUser);
+router.delete('/contact/:id', deleteContact);
 
 module.exports = router;
