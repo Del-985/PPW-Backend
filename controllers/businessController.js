@@ -52,13 +52,13 @@ const loginBusinessUser = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
     );
 
-    // ✅ Set token in secure cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax',
-      maxAge: 1000 * 60 * 60 * 24 * 2 // 2 days
-    });
+   res.cookie('token', token, {
+  httpOnly: true,
+  secure: true,             // force HTTPS
+  sameSite: 'None',         // required for cross-site cookie usage
+  maxAge: 1000 * 60 * 60 * 24 * 2
+});
+
 
     res.status(200).json({ success: true, message: 'Login successful.' });
   } catch (err) {
