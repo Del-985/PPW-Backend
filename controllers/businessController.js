@@ -1,53 +1,38 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// Register business user
 const registerBusinessUser = async (req, res) => {
   const { business_name, email, password } = req.body;
-
   if (!business_name || !email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const result = await pool.query(
       'INSERT INTO business_users (business_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
       [business_name, email, hashedPassword]
     );
 
     res.status(201).json({ success: true, userId: result.rows[0].id });
-
   } catch (err) {
-    if (err.code === '23505') {
-      // Unique violation
-      if (err.detail.includes('email')) {
-        return res.status(409).json({ error: 'Email is already registered.' });
-      }
-      if (err.detail.includes('business_name')) {
-        return res.status(409).json({ error: 'Business name is already registered.' });
-      }
-      return res.status(409).json({ error: 'Duplicate registration.' });
-    }
-
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Registration failed.' });
   }
 };
 
-// Login business user
-const jwt = require('jsonwebtoken');
-
 const loginBusinessUser = async (req, res) => {
   const { email, password } = req.body;
-
   if (!email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
   try {
-    const result = await pool.query('SELECT * FROM business_users WHERE email = $1', [email]);
+    const result = await pool.query(
+      'SELECT * FROM business_users WHERE email = $1',
+      [email]
+    );
 
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials.' });
@@ -60,25 +45,28 @@ const loginBusinessUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // ✅ Generate JWT
+    const token = jwt.sign(
+      { userId: user.id, businessName: user.business_name },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
+    );
 
+    // ✅ Set token in secure cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
-      maxAge: 3600000 // 1 hour
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+      maxAge: 1000 * 60 * 60 * 24 * 2 // 2 days
     });
 
     res.status(200).json({ success: true, message: 'Login successful.' });
-
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Internal server error.' });
   }
 };
 
-
-// View contact submissions for dashboard
 const getBusinessContacts = async (req, res) => {
   try {
     const result = await pool.query(
