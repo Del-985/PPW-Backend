@@ -1,15 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db');
+const {
+  getAllContacts,
+  getAllBusinessUsers,
+  deleteBusinessUser,
+  deleteContact
+} = require('../controllers/adminController');
 
-router.get('/contacts', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM contacts ORDER BY submitted_at DESC');
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching contacts:', err);
-    res.status(500).json({ error: 'Failed to fetch contacts' });
-  }
-});
+const verifyToken = require('../middleware/auth'); // JWT middleware
+
+// Protect all admin routes with verifyToken
+router.get('/contacts', verifyToken, getAllContacts);
+router.get('/business-users', verifyToken, getAllBusinessUsers);
+router.delete('/business-user/:id', verifyToken, deleteBusinessUser);
+router.delete('/contact/:id', verifyToken, deleteContact);
 
 module.exports = router;
