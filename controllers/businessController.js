@@ -45,25 +45,22 @@ const loginBusinessUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
-    // ✅ Generate JWT
-  const token = jwt.sign(
-  {
-    userId: user.id,
-    businessName: user.business_name,
-    is_admin: user.is_admin // Include admin flag in token
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
-);
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        businessName: user.business_name,
+        is_admin: user.is_admin
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
+    );
 
-
-   res.cookie('token', token, {
-  httpOnly: true,
-  secure: true,             // force HTTPS
-  sameSite: 'None',         // required for cross-site cookie usage
-  maxAge: 1000 * 60 * 60 * 24 * 2
-});
-
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 1000 * 60 * 60 * 24 * 2
+    });
 
     res.status(200).json({ success: true, message: 'Login successful.' });
   } catch (err) {
@@ -84,8 +81,55 @@ const getBusinessContacts = async (req, res) => {
   }
 };
 
+const createScheduleEntry = async (req, res) => {
+  const { service_type, scheduled_date, scheduled_time, notes } = req.body;
+  const business_user_id = req.user?.userId;
+
+  if (!business_user_id || !service_type || !scheduled_date || !scheduled_time) {
+    return res.status(400).json({ error: 'Missing required fields.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO schedule (business_user_id, service_type, scheduled_date, scheduled_time, notes, status)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [business_user_id, service_type, scheduled_date, scheduled_time, notes || '', 'Pending']
+    );
+
+    res.status(201).json({ success: true, message: 'Scheduled successfully.', id: result.rows[0].id });
+  } catch (err) {
+    console.error('Schedule insert error:', err);
+    res.status(500).json({ error: 'Failed to schedule task.' });
+  }
+};
+
+const getScheduleEntries = async (req, res) => {
+  const business_user_id = req.user?.userId;
+
+  if (!business_user_id) {
+    return res.status(403).json({ error: 'Unauthorized.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT id, service_type, scheduled_date, scheduled_time, notes, status
+       FROM schedule
+       WHERE business_user_id = $1
+       ORDER BY scheduled_date ASC`,
+      [business_user_id]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Schedule fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch schedule.' });
+  }
+};
+
 module.exports = {
   registerBusinessUser,
   loginBusinessUser,
-  getBusinessContacts
+  getBusinessContacts,
+  createScheduleEntry,
+  getScheduleEntries
 };
