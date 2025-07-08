@@ -119,7 +119,7 @@ const getScheduleEntries = async (req, res) => {
       [business_user_id]
     );
 
-    res.status(200).json(result.rows);
+    res.status(200).json({ tasks: result.rows });
   } catch (err) {
     console.error('Schedule fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch schedule.' });
