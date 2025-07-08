@@ -7,8 +7,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://pioneerwashandlandscape.com', // Adjust as needed
+  origin: [
+    'https://pioneerwashandlandscape.com',
+    'https://www.pioneerwashandlandscape.com'
+  ],
   credentials: true
+}));
+
 }));
 app.use(express.json());
 app.use(cookieParser());
