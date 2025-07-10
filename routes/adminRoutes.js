@@ -10,6 +10,7 @@ const {
 
 const verifyToken = require('../middleware/auth');
 const adminOnly = require('../middleware/adminOnly'); // 🔒
+const validateStatus = require('../middleware/validateStatus');
 
 router.use(verifyToken, adminOnly); // Protect all admin routes
 
@@ -20,6 +21,8 @@ router.delete('/business-user/:id', deleteBusinessUser);
 router.delete('/contact/:id', deleteContact);
 
 // Schedule management
+router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus);
+router.patch('/schedule/bulk-approve', bulkApproveSchedules); // ✅
 router.patch('/schedule/:id/status', updateScheduleStatus); // 🆕 Status updates only
 
 module.exports = router;
