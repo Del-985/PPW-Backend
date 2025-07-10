@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 
-// Get all contact submissions
+// 🔹 Get all contact submissions
 const getAllContacts = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM contacts ORDER BY submitted_at DESC');
@@ -11,7 +11,7 @@ const getAllContacts = async (req, res) => {
   }
 };
 
-// Get all registered business users
+// 🔹 Get all registered business users
 const getAllBusinessUsers = async (req, res) => {
   try {
     const result = await pool.query('SELECT id, business_name, email FROM business_users ORDER BY id');
@@ -22,7 +22,7 @@ const getAllBusinessUsers = async (req, res) => {
   }
 };
 
-// Delete a business user by ID
+// 🔹 Delete a business user by ID
 const deleteBusinessUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -37,7 +37,7 @@ const deleteBusinessUser = async (req, res) => {
   }
 };
 
-// Delete a contact submission by ID
+// 🔹 Delete a contact submission by ID
 const deleteContact = async (req, res) => {
   const { id } = req.params;
   try {
@@ -52,7 +52,7 @@ const deleteContact = async (req, res) => {
   }
 };
 
-// Admin-only: Update schedule status (strict, with admin check)
+// 🔹 Admin-only: Update schedule status
 const updateScheduleStatus = async (req, res) => {
   const scheduleId = req.params.id;
   const { status } = req.body;
@@ -75,13 +75,6 @@ const updateScheduleStatus = async (req, res) => {
       return res.status(404).json({ error: 'Schedule entry not found.' });
     }
 
-    // Optional audit logging
-    await pool.query(
-      `INSERT INTO audit_log (admin_id, schedule_id, action, status)
-       VALUES ($1, $2, 'status_update', $3)`,
-      [req.user.userId, scheduleId, status]
-    );
-
     res.status(200).json({ success: true, message: 'Status updated.' });
   } catch (err) {
     console.error('Admin status update error:', err);
@@ -89,7 +82,7 @@ const updateScheduleStatus = async (req, res) => {
   }
 };
 
-// Optional helper: Approve or Deny via shared logic (no admin check here)
+// 🔹 (Optional variant) Approve or deny a schedule entry
 const approveOrDenySchedule = async (req, res) => {
   const scheduleId = req.params.id;
   const { status } = req.body;
@@ -115,11 +108,29 @@ const approveOrDenySchedule = async (req, res) => {
   }
 };
 
+// 🔹 Get all schedule entries (admin view)
+const getAllScheduleEntries = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT s.*, b.business_name, b.email
+       FROM schedule s
+       JOIN business_users b ON s.business_user_id = b.id
+       ORDER BY s.scheduled_date ASC`
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching all schedule entries:', err);
+    res.status(500).json({ error: 'Failed to fetch schedule entries.' });
+  }
+};
+
+// ✅ Consolidated exports
 module.exports = {
   getAllContacts,
   getAllBusinessUsers,
   deleteBusinessUser,
   deleteContact,
   updateScheduleStatus,
-  approveOrDenySchedule
+  approveOrDenySchedule,
+  getAllScheduleEntries
 };
