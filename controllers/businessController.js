@@ -119,11 +119,66 @@ const getScheduleEntries = async (req, res) => {
       [business_user_id]
     );
 
-    res.status(200).json(result.rows); // ← plain array
-
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error('Schedule fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch schedule.' });
+  }
+};
+
+const updateScheduleEntry = async (req, res) => {
+  const business_user_id = req.user?.userId;
+  const entryId = req.params.id;
+  const { service_type, scheduled_time, notes } = req.body;
+
+  if (!business_user_id || !entryId) {
+    return res.status(400).json({ error: 'Invalid request.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE schedule
+       SET service_type = $1, scheduled_time = $2, notes = $3
+       WHERE id = $4 AND business_user_id = $5
+       RETURNING id`,
+      [service_type, scheduled_time, notes || '', entryId, business_user_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Schedule entry not found or unauthorized.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Schedule entry updated.' });
+  } catch (err) {
+    console.error('Schedule update error:', err);
+    res.status(500).json({ error: 'Failed to update schedule entry.' });
+  }
+};
+
+const deleteScheduleEntry = async (req, res) => {
+  const business_user_id = req.user?.userId;
+  const entryId = req.params.id;
+
+  if (!business_user_id || !entryId) {
+    return res.status(400).json({ error: 'Invalid request.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM schedule
+       WHERE id = $1 AND business_user_id = $2
+       RETURNING id`,
+      [entryId, business_user_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Schedule entry not found or unauthorized.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Schedule entry deleted.' });
+  } catch (err) {
+    console.error('Schedule delete error:', err);
+    res.status(500).json({ error: 'Failed to delete schedule entry.' });
   }
 };
 
@@ -132,5 +187,7 @@ module.exports = {
   loginBusinessUser,
   getBusinessContacts,
   createScheduleEntry,
-  getScheduleEntries
+  getScheduleEntries,
+  updateScheduleEntry,
+  deleteScheduleEntry
 };
