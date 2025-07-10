@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getAllContacts,
+  getAllContacts, 
   getAllBusinessUsers,
   deleteBusinessUser,
   deleteContact,
