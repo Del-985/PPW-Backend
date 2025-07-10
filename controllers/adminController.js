@@ -52,6 +52,40 @@ const deleteContact = async (req, res) => {
   }
 };
 
+// controllers/adminController.js
+const pool = require('../config/db');
+
+const updateScheduleStatus = async (req, res) => {
+  const scheduleId = req.params.id;
+  const { status } = req.body;
+
+  if (!['Approved', 'Denied'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value.' });
+  }
+
+  if (!req.user?.is_admin) {
+    return res.status(403).json({ error: 'Forbidden. Admins only.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE schedule SET status = $1 WHERE id = $2 RETURNING id`,
+      [status, scheduleId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Schedule entry not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Status updated.' });
+  } catch (err) {
+    console.error('Admin status update error:', err);
+    res.status(500).json({ error: 'Failed to update status.' });
+  }
+};
+
+module.exports = { updateScheduleStatus };
+
 module.exports = {
   getAllContacts,
   getAllBusinessUsers,
