@@ -124,6 +124,22 @@ const getAllScheduleEntries = async (req, res) => {
   }
 };
 
+// 🔹 Get all schedule entries (admin view)
+const getAllScheduleEntries = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT s.*, b.business_name, b.email
+       FROM schedule s
+       JOIN business_users b ON s.business_user_id = b.id
+       ORDER BY s.scheduled_date ASC`
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching all schedule entries:', err);
+    res.status(500).json({ error: 'Failed to fetch schedule entries.' });
+  }
+};
+
 // ✅ Consolidated exports
 module.exports = {
   getAllContacts,
