@@ -82,47 +82,7 @@ const updateScheduleStatus = async (req, res) => {
   }
 };
 
-// 🔹 (Optional variant) Approve or deny a schedule entry
-const approveOrDenySchedule = async (req, res) => {
-  const scheduleId = req.params.id;
-  const { status } = req.body;
 
-  if (!['Approved', 'Denied'].includes(status)) {
-    return res.status(400).json({ error: 'Invalid status value.' });
-  }
-
-  try {
-    const result = await pool.query(
-      `UPDATE schedule SET status = $1 WHERE id = $2 RETURNING id`,
-      [status, scheduleId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Schedule entry not found.' });
-    }
-
-    res.status(200).json({ success: true, message: `Status updated to ${status}.` });
-  } catch (err) {
-    console.error('Admin status update error:', err);
-    res.status(500).json({ error: 'Failed to update status.' });
-  }
-};
-
-// 🔹 Get all schedule entries (admin view)
-const getAllScheduleEntries = async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT s.*, b.business_name, b.email
-       FROM schedule s
-       JOIN business_users b ON s.business_user_id = b.id
-       ORDER BY s.scheduled_date ASC`
-    );
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error('Error fetching all schedule entries:', err);
-    res.status(500).json({ error: 'Failed to fetch schedule entries.' });
-  }
-};
 
 // 🔹 Get all schedule entries (admin view)
 const getAllScheduleEntries = async (req, res) => {
