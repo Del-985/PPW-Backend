@@ -140,6 +140,38 @@ const getAllScheduleEntries = async (req, res) => {
   }
 };
 
+const bulkUpdateScheduleStatus = async (req, res) => {
+  const { ids, status } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'IDs array is required.' });
+  }
+
+  if (!['Approved', 'Denied'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value.' });
+  }
+
+  if (!req.user?.is_admin) {
+    return res.status(403).json({ error: 'Admins only.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE schedule SET status = $1 WHERE id = ANY($2::int[]) RETURNING id`,
+      [status, ids]
+    );
+
+    res.status(200).json({
+      success: true,
+      updated: result.rows.map(r => r.id),
+      message: `Status updated to '${status}' for ${result.rowCount} entries.`
+    });
+  } catch (err) {
+    console.error('Bulk status update error:', err);
+    res.status(500).json({ error: 'Failed to update statuses.' });
+  }
+};
+
 // ✅ Consolidated exports
 module.exports = {
   getAllContacts,
