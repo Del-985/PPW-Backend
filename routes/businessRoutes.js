@@ -1,6 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
+const allowBusinessEdit = require('../middleware/allowBusinessEdit');
 
 const {
   registerBusinessUser,
@@ -33,6 +34,8 @@ router.post('/login', loginLimiter, loginBusinessUser);
 router.get('/contacts', verifyToken, getBusinessContacts);
 
 // 📅 Schedule CRUD
+router.patch('/schedule/:id', verifyToken, allowBusinessEdit, updateScheduleEntry);
+router.delete('/schedule/:id', verifyToken, allowBusinessEdit, deleteScheduleEntry);
 router.post('/schedule', verifyToken, createScheduleEntry);
 router.get('/schedule', verifyToken, getScheduleEntries);
 router.patch('/schedule/:id', verifyToken, updateScheduleEntry);
