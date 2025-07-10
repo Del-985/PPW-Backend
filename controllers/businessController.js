@@ -2,6 +2,7 @@ const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// ====== REGISTER ======
 const registerBusinessUser = async (req, res) => {
   const { business_name, email, password } = req.body;
   if (!business_name || !email || !password) {
@@ -22,6 +23,7 @@ const registerBusinessUser = async (req, res) => {
   }
 };
 
+// ====== LOGIN ======
 const loginBusinessUser = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -69,6 +71,7 @@ const loginBusinessUser = async (req, res) => {
   }
 };
 
+// ====== CONTACTS ======
 const getBusinessContacts = async (req, res) => {
   try {
     const result = await pool.query(
@@ -81,6 +84,7 @@ const getBusinessContacts = async (req, res) => {
   }
 };
 
+// ====== SCHEDULE: CREATE ======
 const createScheduleEntry = async (req, res) => {
   const { service_type, scheduled_date, scheduled_time, notes } = req.body;
   const business_user_id = req.user?.userId;
@@ -103,6 +107,7 @@ const createScheduleEntry = async (req, res) => {
   }
 };
 
+// ====== SCHEDULE: READ ======
 const getScheduleEntries = async (req, res) => {
   const business_user_id = req.user?.userId;
 
@@ -126,6 +131,7 @@ const getScheduleEntries = async (req, res) => {
   }
 };
 
+// ====== SCHEDULE: UPDATE (NO STATUS CHANGE) ======
 const updateScheduleEntry = async (req, res) => {
   const business_user_id = req.user?.userId;
   const entryId = req.params.id;
@@ -155,6 +161,7 @@ const updateScheduleEntry = async (req, res) => {
   }
 };
 
+// ====== SCHEDULE: DELETE ======
 const deleteScheduleEntry = async (req, res) => {
   const business_user_id = req.user?.userId;
   const entryId = req.params.id;
