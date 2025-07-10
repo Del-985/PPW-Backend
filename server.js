@@ -22,6 +22,7 @@ app.use(cookieParser());
 const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const businessRoutes = require('./routes/businessRoutes');
+app.use('/api', require('./routes/generalRoutes'));
 
 app.use('/api', contactRoutes);
 app.use('/api/admin', adminRoutes);
