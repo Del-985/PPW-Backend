@@ -52,9 +52,7 @@ const deleteContact = async (req, res) => {
   }
 };
 
-// controllers/adminController.js
-const pool = require('../config/db');
-
+// Admin-only: Update schedule status (strict, with admin check)
 const updateScheduleStatus = async (req, res) => {
   const scheduleId = req.params.id;
   const { status } = req.body;
@@ -77,6 +75,13 @@ const updateScheduleStatus = async (req, res) => {
       return res.status(404).json({ error: 'Schedule entry not found.' });
     }
 
+    // Optional audit logging
+    await pool.query(
+      `INSERT INTO audit_log (admin_id, schedule_id, action, status)
+       VALUES ($1, $2, 'status_update', $3)`,
+      [req.user.userId, scheduleId, status]
+    );
+
     res.status(200).json({ success: true, message: 'Status updated.' });
   } catch (err) {
     console.error('Admin status update error:', err);
@@ -84,6 +89,7 @@ const updateScheduleStatus = async (req, res) => {
   }
 };
 
+// Optional helper: Approve or Deny via shared logic (no admin check here)
 const approveOrDenySchedule = async (req, res) => {
   const scheduleId = req.params.id;
   const { status } = req.body;
@@ -109,11 +115,11 @@ const approveOrDenySchedule = async (req, res) => {
   }
 };
 
-module.exports = { updateScheduleStatus };
-
 module.exports = {
   getAllContacts,
   getAllBusinessUsers,
   deleteBusinessUser,
-  deleteContact
+  deleteContact,
+  updateScheduleStatus,
+  approveOrDenySchedule
 };
