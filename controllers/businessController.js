@@ -135,10 +135,14 @@ const getScheduleEntries = async (req, res) => {
 const updateScheduleEntry = async (req, res) => {
   const business_user_id = req.user?.userId;
   const entryId = req.params.id;
-  const { service_type, scheduled_time, notes } = req.body;
+  const { service_type, scheduled_time, notes, status } = req.body;
 
   if (!business_user_id || !entryId) {
     return res.status(400).json({ error: 'Invalid request.' });
+  }
+
+  if (status && !req.user?.is_admin) {
+    return res.status(403).json({ error: 'You cannot update the status field.' });
   }
 
   try {
