@@ -61,6 +61,7 @@ const updateScheduleStatus = async (req, res) => {
     return res.status(400).json({ error: 'Invalid status value.' });
   }
 
+  const adminId = req.user?.userId;
   if (!req.user?.is_admin) {
     return res.status(403).json({ error: 'Forbidden. Admins only.' });
   }
@@ -75,14 +76,19 @@ const updateScheduleStatus = async (req, res) => {
       return res.status(404).json({ error: 'Schedule entry not found.' });
     }
 
+    // 🔹 Audit Log
+    await pool.query(
+      `INSERT INTO audit_log (admin_id, action, schedule_id, timestamp)
+       VALUES ($1, $2, $3, NOW())`,
+      [adminId, `Status set to ${status}`, scheduleId]
+    );
+
     res.status(200).json({ success: true, message: 'Status updated.' });
   } catch (err) {
     console.error('Admin status update error:', err);
     res.status(500).json({ error: 'Failed to update status.' });
   }
 };
-
-
 
 // 🔹 Get all schedule entries (admin view)
 const getAllScheduleEntries = async (req, res) => {
@@ -100,6 +106,7 @@ const getAllScheduleEntries = async (req, res) => {
   }
 };
 
+// 🔹 Bulk update statuses (admin)
 const bulkUpdateScheduleStatus = async (req, res) => {
   const { ids, status } = req.body;
 
@@ -111,6 +118,7 @@ const bulkUpdateScheduleStatus = async (req, res) => {
     return res.status(400).json({ error: 'Invalid status value.' });
   }
 
+  const adminId = req.user?.userId;
   if (!req.user?.is_admin) {
     return res.status(403).json({ error: 'Admins only.' });
   }
@@ -120,6 +128,16 @@ const bulkUpdateScheduleStatus = async (req, res) => {
       `UPDATE schedule SET status = $1 WHERE id = ANY($2::int[]) RETURNING id`,
       [status, ids]
     );
+
+    // 🔹 Bulk Audit Logs
+    const auditInserts = result.rows.map(row => 
+      pool.query(
+        `INSERT INTO audit_log (admin_id, action, schedule_id, timestamp)
+         VALUES ($1, $2, $3, NOW())`,
+        [adminId, `Bulk status set to ${status}`, row.id]
+      )
+    );
+    await Promise.all(auditInserts);
 
     res.status(200).json({
       success: true,
