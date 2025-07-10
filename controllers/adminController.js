@@ -180,5 +180,6 @@ module.exports = {
   deleteContact,
   updateScheduleStatus,
   approveOrDenySchedule,
-  getAllScheduleEntries
+  getAllScheduleEntries,
+  bulkUpdateScheduleStatus
 };
