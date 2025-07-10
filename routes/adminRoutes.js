@@ -25,5 +25,6 @@ router.delete('/contact/:id', deleteContact);
 router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus);
 router.patch('/schedule/bulk-approve', bulkApproveSchedules); // ✅
 router.patch('/schedule/:id/status', updateScheduleStatus); // 🆕 Status updates only
+router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus);
 
 module.exports = router;
