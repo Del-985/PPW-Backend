@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getAllContacts, 
+  getAllContacts,
   getAllBusinessUsers,
+  getAllScheduleEntries,
   deleteBusinessUser,
   deleteContact,
-  updateScheduleStatus // 🆕 Admin-only patch endpoint
+  updateScheduleStatus,
+  bulkUpdateScheduleStatus
 } = require('../controllers/adminController');
 
 const verifyToken = require('../middleware/auth');
@@ -22,9 +24,7 @@ router.delete('/business-user/:id', deleteBusinessUser);
 router.delete('/contact/:id', deleteContact);
 
 // Schedule management
-router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus);
-router.patch('/schedule/bulk-approve', bulkApproveSchedules); // ✅
-router.patch('/schedule/:id/status', updateScheduleStatus); // 🆕 Status updates only
-router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus);
+router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus); // single schedule status update
+router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus); // bulk status update
 
 module.exports = router;
