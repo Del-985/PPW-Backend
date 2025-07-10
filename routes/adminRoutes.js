@@ -17,6 +17,7 @@ router.use(verifyToken, adminOnly); // Protect all admin routes
 // Contact and User management
 router.get('/contacts', getAllContacts);
 router.get('/business-users', getAllBusinessUsers);
+router.get('/schedule', getAllScheduleEntries); // 📅 Admin view of all schedules
 router.delete('/business-user/:id', deleteBusinessUser);
 router.delete('/contact/:id', deleteContact);
 
