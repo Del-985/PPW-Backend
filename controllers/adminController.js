@@ -139,7 +139,6 @@ module.exports = {
   deleteBusinessUser,
   deleteContact,
   updateScheduleStatus,
-  approveOrDenySchedule,
   getAllScheduleEntries,
   bulkUpdateScheduleStatus
 };
