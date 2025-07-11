@@ -105,6 +105,9 @@ const createScheduleEntry = async (req, res) => {
     console.error('Schedule insert error:', err);
     res.status(500).json({ error: 'Failed to schedule task.' });
   }
+
+  console.log('Creating entry for user:', req.user);
+
 };
 
 // ====== SCHEDULE: READ ======
