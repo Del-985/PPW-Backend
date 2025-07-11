@@ -71,14 +71,14 @@ const loginBusinessUser = async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 
-  console.log('Signed token:', token);
+  
 res.cookie('token', token, {
   httpOnly: true,
   secure: true,
   sameSite: 'None',
   maxAge: 1000 * 60 * 60 * 24 * 2 // 2 days
 });
-
+console.log('Signed token:', token);
 
 };
 
