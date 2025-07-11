@@ -11,17 +11,17 @@ const verifyToken = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('Decoded JWT:', decoded);
 
-    // Accept both admin and business users
-    if (!decoded || (typeof decoded.userId !== 'number' && typeof decoded.adminId !== 'number')) {
+    // ✅ Require a valid userId
+    if (!decoded || typeof decoded.userId !== 'number') {
       return res.status(403).json({ error: 'Invalid token payload.' });
     }
 
-    // Set the appropriate user context
-    if (decoded.userId) {
-      req.user = { role: 'business', userId: decoded.userId };
-    } else if (decoded.adminId) {
-      req.user = { role: 'admin', adminId: decoded.adminId };
-    }
+    // ✅ Use is_admin flag to assign role
+    req.user = {
+      role: decoded.is_admin ? 'admin' : 'business',
+      userId: decoded.userId,
+      is_admin: decoded.is_admin
+    };
 
     next();
   } catch (err) {
