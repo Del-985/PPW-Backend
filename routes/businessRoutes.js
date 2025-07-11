@@ -38,7 +38,5 @@ router.patch('/schedule/:id', verifyToken, allowBusinessEdit, updateScheduleEntr
 router.delete('/schedule/:id', verifyToken, allowBusinessEdit, deleteScheduleEntry);
 router.post('/schedule', verifyToken, createScheduleEntry);
 router.get('/schedule', verifyToken, getScheduleEntries);
-router.patch('/schedule/:id', verifyToken, updateScheduleEntry);
-router.delete('/schedule/:id', verifyToken, deleteScheduleEntry);
 
 module.exports = router;
