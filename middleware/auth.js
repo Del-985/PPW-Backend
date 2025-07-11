@@ -10,13 +10,17 @@ const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Validate that decoded payload has a userId (or equivalent)
-    if (!decoded || typeof decoded.userId !== 'number') {
+    // Accept both admin and business users
+    if (!decoded || (typeof decoded.userId !== 'number' && typeof decoded.adminId !== 'number')) {
       return res.status(403).json({ error: 'Invalid token payload.' });
     }
 
-    // Attach the user object (id only, or extend as needed)
-    req.user = { userId: decoded.userId };
+    // Set the appropriate user context
+    if (decoded.userId) {
+      req.user = { role: 'business', userId: decoded.userId };
+    } else if (decoded.adminId) {
+      req.user = { role: 'admin', adminId: decoded.adminId };
+    }
 
     next();
   } catch (err) {
