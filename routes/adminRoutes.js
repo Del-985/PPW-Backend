@@ -26,5 +26,6 @@ router.delete('/contact/:id', deleteContact);
 // Schedule management
 router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus); // single schedule status update
 router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus); // bulk status update
+router.patch('/schedule/:id/status', verifyAdmin, updateScheduleStatus);
 
 module.exports = router;
