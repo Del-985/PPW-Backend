@@ -70,6 +70,10 @@ const loginBusinessUser = async (req, res) => {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Internal server error.' });
   }
+
+  console.log('Signed token:', token);
+res.cookie('token', token, { ... });
+
 };
 
 // ====== CONTACTS ======
