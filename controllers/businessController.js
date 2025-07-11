@@ -64,7 +64,8 @@ const loginBusinessUser = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24 * 2
     });
 
-    res.status(200).json({ success: true, message: 'Login successful.' });
+    res.status(200).json({ success: true, message: 'Login successful.', is_admin: user.is_admin });
+
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Internal server error.' });
