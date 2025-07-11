@@ -26,6 +26,12 @@ const verifyToken = (req, res, next) => {
   } catch (err) {
     res.status(403).json({ error: 'Invalid or expired token.' });
   }
+
+  const token = req.cookies?.token;
+console.log('Cookie token received:', token);
+const decoded = jwt.verify(token, process.env.JWT_SECRET);
+console.log('Decoded user:', decoded);
+
 };
 
 module.exports = verifyToken;
