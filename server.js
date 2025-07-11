@@ -5,6 +5,9 @@ require('dotenv').config();
 
 const app = express();
 
+// ✅ Trust proxy for rate limiting and X-Forwarded-For
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors({
   origin: [
@@ -16,7 +19,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-
 
 // Routes
 const contactRoutes = require('./routes/contactRoutes');
