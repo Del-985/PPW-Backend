@@ -14,7 +14,6 @@ const {
 const verifyToken = require('../middleware/auth');
 const adminOnly = require('../middleware/adminOnly'); // 🔒
 const validateStatus = require('../middleware/validateStatus');
-const getAuditLog = require('../controllers/adminController');
 
 router.use(verifyToken, adminOnly); // Protect all admin routes
 
