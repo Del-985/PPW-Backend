@@ -150,6 +150,28 @@ const bulkUpdateScheduleStatus = async (req, res) => {
   }
 };
 
+const getAuditLog = async (req, res) => {
+  if (!req.user?.is_admin) {
+    return res.status(403).json({ error: 'Forbidden. Admins only.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT al.id, al.action, al.timestamp, a.email AS admin_email, s.service_type, s.scheduled_date
+       FROM audit_log al
+       LEFT JOIN admins a ON al.admin_id = a.id
+       LEFT JOIN schedule s ON al.schedule_id = s.id
+       ORDER BY al.timestamp DESC
+       LIMIT 100`
+    );
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Audit log fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch audit log.' });
+  }
+};
+
 // ✅ Consolidated exports
 module.exports = {
   getAllContacts,
@@ -158,5 +180,6 @@ module.exports = {
   deleteContact,
   updateScheduleStatus,
   getAllScheduleEntries,
-  bulkUpdateScheduleStatus
+  bulkUpdateScheduleStatus,
+  getAuditLog
 };
