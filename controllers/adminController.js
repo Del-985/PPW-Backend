@@ -157,7 +157,7 @@ const getAuditLog = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, action, timestamp, email AS admin_email, service_type, scheduled_date
+      `SELECT id, action, timestamp, email AS admin_email, scheduled_date
        FROM audit_log 
        ORDER BY timestamp DESC
        LIMIT 100`
