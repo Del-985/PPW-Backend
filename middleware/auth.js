@@ -9,8 +9,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded JWT:', decoded);
-
+    
     // ✅ Require a valid userId
     if (!decoded || typeof decoded.userId !== 'number') {
       return res.status(403).json({ error: 'Invalid token payload.' });
