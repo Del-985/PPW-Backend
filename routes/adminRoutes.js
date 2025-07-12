@@ -7,7 +7,8 @@ const {
   deleteBusinessUser,
   deleteContact,
   updateScheduleStatus,
-  bulkUpdateScheduleStatus
+  bulkUpdateScheduleStatus,
+  getAuditLog
 } = require('../controllers/adminController');
 
 const verifyToken = require('../middleware/auth');
