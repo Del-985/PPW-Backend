@@ -170,6 +170,54 @@ const getAuditLog = async (req, res) => {
   }
 };
 
+const createInvoice = async (req, res) => {
+  try {
+    // Extract and trim fields from request
+    let { customer_name, business_user_id, amount, description, due_date } = req.body;
+    customer_name = typeof customer_name === 'string' ? customer_name.trim() : '';
+    description = typeof description === 'string' ? description.trim() : '';
+    // Validate required fields
+    if (!customer_name || !business_user_id || !amount) {
+      return res.status(400).json({ error: 'Missing required fields: customer_name, business_user_id, amount.' });
+    }
+    // Validate types
+    if (isNaN(Number(amount)) || Number(amount) <= 0) {
+      return res.status(400).json({ error: 'Amount must be a positive number.' });
+    }
+    if (isNaN(Number(business_user_id)) || Number(business_user_id) <= 0) {
+      return res.status(400).json({ error: 'business_user_id must be a valid user ID.' });
+    }
+    // (Optional) Validate due date
+    if (due_date && isNaN(Date.parse(due_date))) {
+      return res.status(400).json({ error: 'Due date must be a valid date (YYYY-MM-DD).' });
+    }
+
+    // Insert into invoices table
+    const result = await db.query(
+      `INSERT INTO invoices
+        (customer_name, business_user_id, amount, description, due_date, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())
+       RETURNING id, customer_name, business_user_id, amount, description, due_date, created_at`,
+      [
+        customer_name,
+        Number(business_user_id),
+        Number(amount),
+        description || null,
+        due_date || null
+      ]
+    );
+
+    return res.status(201).json({
+      message: 'Invoice created successfully.',
+      invoice: result.rows[0]
+    });
+  } catch (err) {
+    // Log server error for audit/debugging
+    console.error('Error creating invoice:', err);
+    return res.status(500).json({ error: 'An error occurred while creating the invoice.' });
+  }
+};
+
 // ✅ Consolidated exports
 module.exports = {
   getAllContacts,
@@ -179,5 +227,6 @@ module.exports = {
   updateScheduleStatus,
   getAllScheduleEntries,
   bulkUpdateScheduleStatus,
-  getAuditLog
+  getAuditLog,
+  createInvoice
 };
