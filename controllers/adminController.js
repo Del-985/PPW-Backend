@@ -286,11 +286,17 @@ const generateInvoicePDF = async (req, res) => {
     const logoPath = path.join(__dirname, '../assets/logo.jpg');
     doc.image(logoPath, 50, 50, { width: 120 });
 
-    doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 50, 50);
-    doc.fontSize(10).text(
-      '51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com',
-      50, 80
-    );
+   doc.fontSize(24).text(
+  'Pioneer Pressure Washing, LLC',
+  50, 50,
+  { align: 'right' }
+);
+doc.fontSize(10).text(
+  '51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com',
+  50, 80,
+  { align: 'right' }
+);
+
 
     // Add some vertical space after logo/header block
     doc.moveDown(4);
