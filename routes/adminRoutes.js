@@ -8,7 +8,8 @@ const {
   deleteContact,
   updateScheduleStatus,
   bulkUpdateScheduleStatus,
-  getAuditLog
+  getAuditLog,
+  createInvoice
 } = require('../controllers/adminController');
 
 const verifyToken = require('../middleware/auth');
@@ -28,5 +29,8 @@ router.delete('/contact/:id', deleteContact);
 // Schedule management
 router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus); // single schedule status update
 router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus); // bulk status update
+
+// Invoice creation
+router.post('/invoice', createInvoice);
 
 module.exports = router;
