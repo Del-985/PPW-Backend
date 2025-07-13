@@ -264,8 +264,8 @@ const generateInvoicePDF = async (req, res) => {
     const { id } = req.params;
     const result = await pool.query(`
       SELECT 
-        invoices.*,
-        business_users.business_name AS business_name
+        invoices.*, 
+        business_users.business_name
       FROM invoices
       JOIN business_users ON invoices.business_user_id = business_users.id
       WHERE invoices.id = $1
@@ -279,18 +279,42 @@ const generateInvoicePDF = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
 
+    // LOGO (adjust path as needed)
+    doc.image(path.join(__dirname, '../assets/logo.png'), 50, 50, { width: 120 });
+    doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 200, 60, { align: 'right' });
+    doc.fontSize(10).text('51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com', 200, 90, { align: 'right' });
+
+    doc.moveDown(3);
+
+    // INVOICE HEADER
     doc.fontSize(18).text('INVOICE', { align: 'center' });
     doc.moveDown();
 
-    doc.fontSize(12).text(`Invoice #: ${inv.id}`);
-    doc.text(`Customer: ${inv.customer_name}`);
-    doc.text(`Business: ${inv.business_name}`);
-    doc.text(`Amount: $${Number(inv.amount).toFixed(2)}`);
-    doc.text(`Description: ${inv.description || 'N/A'}`);
-    doc.text(`Due Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
+    // Info Block
+    doc.fontSize(12);
+    doc.text(`Invoice #: ${inv.id}`);
+    doc.text(`Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
     doc.text(`Service Date: ${inv.service_date ? new Date(inv.service_date).toLocaleDateString() : 'N/A'}`);
-    doc.text(`Paid: ${inv.paid ? 'Yes' : 'No'}`);
-    if (inv.paid && inv.paid_at) doc.text(`Paid At: ${new Date(inv.paid_at).toLocaleString()}`);
+    doc.moveDown();
+
+    // Draw a separator
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown();
+
+    // Customer and Business
+    doc.font('Helvetica-Bold').text('Billed To:', { continued: true }).font('Helvetica').text(` ${inv.customer_name}`);
+    doc.font('Helvetica-Bold').text('Business:', { continued: true }).font('Helvetica').text(` ${inv.business_name}`);
+    doc.moveDown();
+
+    // Description and Amount
+    doc.font('Helvetica-Bold').text('Description:', { continued: true }).font('Helvetica').text(` ${inv.description || 'N/A'}`);
+    doc.font('Helvetica-Bold').text('Amount Due:', { continued: true }).font('Helvetica').text(` $${Number(inv.amount).toFixed(2)}`);
+    doc.moveDown();
+
+    // Payment Status
+    doc.font('Helvetica-Bold').text('Status:', { continued: true }).font('Helvetica').text(inv.paid ? 'Paid' : 'Unpaid');
+    if (inv.paid && inv.paid_at) doc.text(`Paid At: ${new Date(inv.paid_at).toLocaleDateString()}`);
+    doc.moveDown();
 
     doc.end();
   } catch (err) {
