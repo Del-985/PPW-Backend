@@ -228,12 +228,6 @@ const getAllInvoices = async (req, res) => {
   }
 };
 
-// In your module.exports
-module.exports = {
-  // ...other functions,
-  getAllInvoices,
-  createInvoice,
-};
 
 
 // ✅ Consolidated exports
@@ -246,5 +240,6 @@ module.exports = {
   getAllScheduleEntries,
   bulkUpdateScheduleStatus,
   getAuditLog,
-  createInvoice
+  createInvoice,
+  getAllInvoices
 };
