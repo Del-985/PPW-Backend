@@ -228,6 +228,35 @@ const getAllInvoices = async (req, res) => {
   }
 };
 
+const markInvoicePaid = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `UPDATE invoices SET paid = true, paid_at = NOW() WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: "Invoice not found" });
+    res.json({ message: "Invoice marked as paid", invoice: result.rows[0] });
+  } catch (err) {
+    console.error("Error marking invoice as paid:", err);
+    res.status(500).json({ error: "Failed to mark invoice as paid" });
+  }
+};
+
+const deleteInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `DELETE FROM invoices WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: "Invoice not found" });
+    res.json({ message: "Invoice deleted", invoice: result.rows[0] });
+  } catch (err) {
+    console.error("Error deleting invoice:", err);
+    res.status(500).json({ error: "Failed to delete invoice" });
+  }
+};
 
 
 // ✅ Consolidated exports
@@ -241,5 +270,7 @@ module.exports = {
   bulkUpdateScheduleStatus,
   getAuditLog,
   createInvoice,
-  getAllInvoices
+  getAllInvoices,
+  markInvoicePaid,
+  deleteInvoice
 };
