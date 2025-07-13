@@ -276,7 +276,6 @@ const generateInvoicePDF = async (req, res) => {
         business_users.business_name
       FROM invoices
       JOIN business_users ON invoices.business_user_id = business_users.id
-      LEFT JOIN schedule ON invoices.schedule_id = schedule.id
       WHERE invoices.id = $1
     `, [id]);
     if (result.rowCount === 0) return res.status(404).send('Invoice not found');
@@ -309,8 +308,8 @@ const generateInvoicePDF = async (req, res) => {
 
     // Dates block (left-aligned)
     const today = new Date();
-    const serviceDateStr = inv.scheduled_date
-      ? new Date(inv.scheduled_date).toLocaleDateString()
+    const serviceDateStr = inv.service_date
+      ? new Date(inv.service_date).toLocaleDateString()
       : 'N/A';
     doc.fontSize(12).text(`Date Issued: ${today.toLocaleDateString()}`, { align: 'left' });
     doc.fontSize(12).text(`Service Date: ${serviceDateStr}`, { align: 'left' });
