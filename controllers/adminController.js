@@ -176,7 +176,7 @@ const getAuditLog = async (req, res) => {
 const createInvoice = async (req, res) => {
   try {
     // Extract and trim fields from request
-    let { customer_name, business_user_id, amount, description, due_date } = req.body;
+    let { customer_name, business_user_id, amount, description, due_date, service_date } = req.body;
     customer_name = typeof customer_name === 'string' ? customer_name.trim() : '';
     description = typeof description === 'string' ? description.trim() : '';
     // Validate required fields
@@ -194,19 +194,24 @@ const createInvoice = async (req, res) => {
     if (due_date && isNaN(Date.parse(due_date))) {
       return res.status(400).json({ error: 'Due date must be a valid date (YYYY-MM-DD).' });
     }
+    // (Optional) Validate service date
+    if (service_date && isNaN(Date.parse(service_date))) {
+      return res.status(400).json({ error: 'Service date must be a valid date (YYYY-MM-DD).' });
+    }
 
     // Insert into invoices table
     const result = await pool.query(
       `INSERT INTO invoices
-        (customer_name, business_user_id, amount, description, due_date, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
-       RETURNING id, customer_name, business_user_id, amount, description, due_date, created_at`,
+        (customer_name, business_user_id, amount, description, due_date, service_date, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
+       RETURNING id, customer_name, business_user_id, amount, description, due_date, service_date, created_at`,
       [
         customer_name,
         Number(business_user_id),
         Number(amount),
         description || null,
-        due_date || null
+        due_date || null,
+        service_date || null
       ]
     );
 
