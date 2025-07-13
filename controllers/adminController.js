@@ -193,7 +193,7 @@ const createInvoice = async (req, res) => {
     }
 
     // Insert into invoices table
-    const result = await db.query(
+    const result = await pool.query(
       `INSERT INTO invoices
         (customer_name, business_user_id, amount, description, due_date, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW())
