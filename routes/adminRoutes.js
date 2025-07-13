@@ -27,10 +27,17 @@ router.get('/audit-log', verifyToken, getAuditLog);
 router.get('/invoices', getAllInvoices);
 router.delete('/business-user/:id', deleteBusinessUser);
 router.delete('/contact/:id', deleteContact);
+router.delete('/invoice/:id', deleteInvoice); // Delete invoice (DELETE)
 
 // Schedule management
 router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus); // single schedule status update
 router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus); // bulk status update
+router.patch('/invoice/:id/paid', markInvoicePaid); // Mark invoice as paid (PATCH)
+
+
+// Delete invoice (DELETE)
+router.delete('/invoice/:id', deleteInvoice);
+
 
 // Invoice creation
 router.post('/invoice', createInvoice);
