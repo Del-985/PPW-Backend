@@ -334,6 +334,7 @@ const generateInvoicePDF = async (req, res) => {
     // Description and Amount
     doc.font('Helvetica-Bold').text('Description:', { continued: true }).font('Helvetica').text(` ${inv.description || 'N/A'}`);
     doc.font('Helvetica-Bold').text('Amount Due:', { continued: true }).font('Helvetica').text(` $${Number(inv.amount).toFixed(2)}`);
+    doc.font('Helvetica-Bold').text('Due Date:', { continued: true }).font('Helvetica').text(` ${inv.due_date || 'N/A'}`);
     doc.moveDown();
 
     // Payment Status
