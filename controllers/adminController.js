@@ -261,6 +261,9 @@ const deleteInvoice = async (req, res) => {
   }
 };
 
+const path = require('path');
+const PDFDocument = require('pdfkit');
+
 const generateInvoicePDF = async (req, res) => {
   try {
     const { id } = req.params;
@@ -281,29 +284,36 @@ const generateInvoicePDF = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
 
-    // LOGO (adjust path as needed)
-    doc.image(path.join(__dirname, '../assets/logo.jpg'), 50, 50, { width: 120 });
-    doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 200, 60, { align: 'right' });
-    doc.fontSize(10).text('51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com', 200, 90, { align: 'right' });
+    // LOGO left, business info left-aligned
+    const logoPath = path.join(__dirname, '../assets/logo.png');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 50, { width: 120 });
+    }
+    doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 50, 50);
+    doc.fontSize(10).text(
+      '51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com',
+      50, 80
+    );
 
-    doc.moveDown(3);
+    // Add some vertical space after logo/header block
+    doc.moveDown(4);
 
-    // INVOICE HEADER
-    doc.fontSize(18).text('INVOICE', { align: 'center' });
-    doc.moveDown();
+    // INVOICE + Invoice Number, centered below logo/header
+    const invoiceNumber = 1000 + Number(inv.id);
+    doc.fontSize(20).text('INVOICE', { align: 'center' });
+    doc.fontSize(14).text(`Invoice #: ${invoiceNumber}`, { align: 'center' });
+    doc.moveDown(2);
 
-    // Info Block
-    doc.fontSize(12);
-    doc.text(`Invoice #: ${inv.id}`);
-    doc.text(`Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
+    // Info Block (left-aligned)
+    doc.fontSize(12).text(`Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
     doc.text(`Service Date: ${inv.service_date ? new Date(inv.service_date).toLocaleDateString() : 'N/A'}`);
     doc.moveDown();
 
-    // Draw a separator
+    // Separator line
     doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
     doc.moveDown();
 
-    // Customer and Business
+    // Customer and Business Info
     doc.font('Helvetica-Bold').text('Billed To:', { continued: true }).font('Helvetica').text(` ${inv.customer_name}`);
     doc.font('Helvetica-Bold').text('Business:', { continued: true }).font('Helvetica').text(` ${inv.business_name}`);
     doc.moveDown();
@@ -324,6 +334,7 @@ const generateInvoicePDF = async (req, res) => {
     res.status(500).send('Failed to generate PDF');
   }
 };
+
 
 
 
