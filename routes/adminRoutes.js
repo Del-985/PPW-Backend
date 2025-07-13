@@ -18,6 +18,7 @@ const {
 const verifyToken = require('../middleware/auth');
 const adminOnly = require('../middleware/adminOnly'); // 🔒
 const validateStatus = require('../middleware/validateStatus');
+const generateInvoicePDF = require('../controllers/adminController');
 
 router.use(verifyToken, adminOnly); // Protect all admin routes
 
@@ -27,6 +28,7 @@ router.get('/business-users', getAllBusinessUsers);
 router.get('/schedule', getAllScheduleEntries); // 📅 Admin view of all schedules
 router.get('/audit-log', verifyToken, getAuditLog);
 router.get('/invoices', getAllInvoices);
+router.get('/invoice/:id/pdf', generateInvoicePDF);
 router.delete('/business-user/:id', deleteBusinessUser);
 router.delete('/contact/:id', deleteContact);
 router.delete('/invoice/:id', deleteInvoice); // Delete invoice (DELETE)
