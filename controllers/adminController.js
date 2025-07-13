@@ -308,9 +308,16 @@ const generateInvoicePDF = async (req, res) => {
 
     // Dates block (left-aligned)
     const today = new Date();
-    const serviceDateStr = inv.service_date
-      ? new Date(inv.service_date).toLocaleDateString()
-      : 'N/A';
+    let serviceDateStr = 'N/A';
+    if (inv.service_date) {
+      // Handles string or Date type
+      const serviceDate = typeof inv.service_date === 'string'
+        ? new Date(inv.service_date)
+        : inv.service_date;
+      if (!isNaN(serviceDate.getTime())) {
+        serviceDateStr = serviceDate.toLocaleDateString();
+      }
+    }
     doc.fontSize(12).text(`Date Issued: ${today.toLocaleDateString()}`, { align: 'left' });
     doc.fontSize(12).text(`Service Date: ${serviceDateStr}`, { align: 'left' });
     doc.moveDown();
@@ -340,6 +347,7 @@ const generateInvoicePDF = async (req, res) => {
     res.status(500).send('Failed to generate PDF');
   }
 };
+
 
 
 // ✅ Consolidated exports
