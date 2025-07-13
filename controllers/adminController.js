@@ -268,6 +268,20 @@ const deleteInvoice = async (req, res) => {
 
 
 const generateInvoicePDF = async (req, res) => {
+   const displayDate = d => {
+    if (!d) return 'N/A';
+    if (typeof d === 'string') {
+      const match = d.match(/^(\d{4}-\d{2}-\d{2})/);
+      return match ? match[1] : d;
+    }
+    if (d instanceof Date) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+    return 'N/A';
+  };  
   try {
     const { id } = req.params;
     const result = await pool.query(`
