@@ -283,7 +283,7 @@ const generateInvoicePDF = async (req, res) => {
     doc.pipe(res);
 
     // LOGO left, business info left-aligned
-    const logoPath = path.join(__dirname, '../assets/logo.png');
+    const logoPath = path.join(__dirname, '../assets/logo.jpg');
     doc.image(logoPath, 50, 50, { width: 120 });
 
     doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 50, 50);
