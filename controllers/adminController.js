@@ -284,9 +284,8 @@ const generateInvoicePDF = async (req, res) => {
 
     // LOGO left, business info left-aligned
     const logoPath = path.join(__dirname, '../assets/logo.png');
-    if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, 50, 50, { width: 120 });
-    }
+    doc.image(logoPath, 50, 50, { width: 120 });
+
     doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 50, 50);
     doc.fontSize(10).text(
       '51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com',
@@ -332,9 +331,6 @@ const generateInvoicePDF = async (req, res) => {
     res.status(500).send('Failed to generate PDF');
   }
 };
-
-
-
 
 // ✅ Consolidated exports
 module.exports = {
