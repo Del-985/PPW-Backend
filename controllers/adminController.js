@@ -280,7 +280,7 @@ const generateInvoicePDF = async (req, res) => {
     doc.pipe(res);
 
     // LOGO (adjust path as needed)
-    doc.image(path.join(__dirname, '../assets/logo.png'), 50, 50, { width: 120 });
+    doc.image(path.join(__dirname, '../assets/logo.jpg'), 50, 50, { width: 120 });
     doc.fontSize(24).text('Pioneer Pressure Washing, LLC', 200, 60, { align: 'right' });
     doc.fontSize(10).text('51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com', 200, 90, { align: 'right' });
 
