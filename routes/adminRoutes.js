@@ -23,6 +23,7 @@ router.get('/contacts', getAllContacts);
 router.get('/business-users', getAllBusinessUsers);
 router.get('/schedule', getAllScheduleEntries); // 📅 Admin view of all schedules
 router.get('/audit-log', verifyToken, getAuditLog);
+router.get('/invoices', getAllInvoices);
 router.delete('/business-user/:id', deleteBusinessUser);
 router.delete('/contact/:id', deleteContact);
 
