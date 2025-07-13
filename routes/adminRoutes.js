@@ -10,7 +10,9 @@ const {
   bulkUpdateScheduleStatus,
   getAuditLog,
   createInvoice,
-  getAllInvoices
+  getAllInvoices,
+  markInvoicePaid,
+  deleteInvoice
 } = require('../controllers/adminController');
 
 const verifyToken = require('../middleware/auth');
