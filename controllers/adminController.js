@@ -287,6 +287,14 @@ const generateInvoicePDF = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
 
+    // Helper to extract 'YYYY-MM-DD' from ISO string or Date
+    const displayDate = d => {
+      if (!d) return 'N/A';
+      if (typeof d === 'string') return d.slice(0, 10);
+      if (d instanceof Date) return d.toISOString().slice(0, 10);
+      return 'N/A';
+    };
+
     // LOGO left, business info right-aligned
     const logoPath = path.join(__dirname, '../assets/logo.jpg');
     doc.image(logoPath, 50, 50, { width: 120 });
@@ -306,20 +314,10 @@ const generateInvoicePDF = async (req, res) => {
     doc.fontSize(14).text(`Invoice #: ${invoiceNumber}`, { align: 'center' });
     doc.moveDown(2);
 
-    // Dates block (left-aligned)
+    // Dates block (left-aligned, no time)
     const today = new Date();
-    let serviceDateStr = 'N/A';
-    if (inv.service_date) {
-      // Handles string or Date type
-      const serviceDate = typeof inv.service_date === 'string'
-        ? new Date(inv.service_date)
-        : inv.service_date;
-      if (!isNaN(serviceDate.getTime())) {
-        serviceDateStr = serviceDate.toLocaleDateString();
-      }
-    }
-    doc.fontSize(12).text(`Date Issued: ${today.toLocaleDateString()}`, { align: 'left' });
-    doc.fontSize(12).text(`Service Date: ${serviceDateStr}`, { align: 'left' });
+    doc.fontSize(12).text(`Date Issued: ${displayDate(today)}`, { align: 'left' });
+    doc.fontSize(12).text(`Service Date: ${displayDate(inv.service_date)}`, { align: 'left' });
     doc.moveDown();
 
     // Separator line
@@ -331,15 +329,15 @@ const generateInvoicePDF = async (req, res) => {
     doc.font('Helvetica-Bold').text('Business:', { continued: true }).font('Helvetica').text(` ${inv.business_name}`);
     doc.moveDown();
 
-    // Description and Amount
+    // Description, Amount, Due Date
     doc.font('Helvetica-Bold').text('Description:', { continued: true }).font('Helvetica').text(` ${inv.description || 'N/A'}`);
     doc.font('Helvetica-Bold').text('Amount Due:', { continued: true }).font('Helvetica').text(` $${Number(inv.amount).toFixed(2)}`);
-    doc.font('Helvetica-Bold').text('Due Date:', { continued: true }).font('Helvetica').text(` ${inv.due_date || 'N/A'}`);
+    doc.font('Helvetica-Bold').text('Due Date:', { continued: true }).font('Helvetica').text(` ${displayDate(inv.due_date)}`);
     doc.moveDown();
 
     // Payment Status
     doc.font('Helvetica-Bold').text('Status:', { continued: true }).font('Helvetica').text(inv.paid ? 'Paid' : 'Unpaid');
-    if (inv.paid && inv.paid_at) doc.text(`Paid At: ${new Date(inv.paid_at).toLocaleDateString()}`);
+    if (inv.paid && inv.paid_at) doc.text(`Paid At: ${displayDate(inv.paid_at)}`);
     doc.moveDown();
 
     doc.end();
@@ -348,6 +346,7 @@ const generateInvoicePDF = async (req, res) => {
     res.status(500).send('Failed to generate PDF');
   }
 };
+
 
 
 
