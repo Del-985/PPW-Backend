@@ -12,7 +12,8 @@ const {
   createInvoice,
   getAllInvoices,
   markInvoicePaid,
-  deleteInvoice
+  deleteInvoice,
+  generateInvoicePDF
 } = require('../controllers/adminController');
 
 const verifyToken = require('../middleware/auth');
