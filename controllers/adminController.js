@@ -262,15 +262,20 @@ const deleteInvoice = async (req, res) => {
 };
 
 
+const path = require('path');
+const PDFDocument = require('pdfkit');
+
 const generateInvoicePDF = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(`
       SELECT 
         invoices.*, 
-        business_users.business_name
+        business_users.business_name,
+        schedule.scheduled_date
       FROM invoices
       JOIN business_users ON invoices.business_user_id = business_users.id
+      LEFT JOIN schedule ON invoices.schedule_id = schedule.id
       WHERE invoices.id = $1
     `, [id]);
     if (result.rowCount === 0) return res.status(404).send('Invoice not found');
@@ -282,14 +287,15 @@ const generateInvoicePDF = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
 
-    // LOGO left, business info left-aligned
+    // LOGO left, business info right-aligned
     const logoPath = path.join(__dirname, '../assets/logo.jpg');
     doc.image(logoPath, 50, 50, { width: 120 });
 
     doc.fontSize(24).text('Pioneer Pressure Washing, LLC', { align: 'right' });
-    doc.fontSize(10).text('51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com', { align: 'right' });
-
-
+    doc.fontSize(10).text(
+      '51020 Lawrence Creek Rd\nFranklinton, LA 70438\n(Your Phone Here)\nadmin@pioneerwashandlandscape.com',
+      { align: 'right' }
+    );
 
     // Add some vertical space after logo/header block
     doc.moveDown(4);
@@ -300,9 +306,13 @@ const generateInvoicePDF = async (req, res) => {
     doc.fontSize(14).text(`Invoice #: ${invoiceNumber}`, { align: 'center' });
     doc.moveDown(2);
 
-    // Info Block (left-aligned)
-    doc.fontSize(12).text(`Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
-    doc.text(`Service Date: ${inv.service_date ? new Date(inv.service_date).toLocaleDateString() : 'N/A'}`);
+    // Dates block (left-aligned)
+    const today = new Date();
+    const serviceDateStr = inv.scheduled_date
+      ? new Date(inv.scheduled_date).toLocaleDateString()
+      : 'N/A';
+    doc.fontSize(12).text(`Date Issued: ${today.toLocaleDateString()}`, { align: 'left' });
+    doc.fontSize(12).text(`Service Date: ${serviceDateStr}`, { align: 'left' });
     doc.moveDown();
 
     // Separator line
@@ -330,6 +340,7 @@ const generateInvoicePDF = async (req, res) => {
     res.status(500).send('Failed to generate PDF');
   }
 };
+
 
 // ✅ Consolidated exports
 module.exports = {
