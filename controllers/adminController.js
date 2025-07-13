@@ -264,7 +264,7 @@ const generateInvoicePDF = async (req, res) => {
     const result = await pool.query(`
       SELECT 
         invoices.*,
-        business_users.name AS business_name
+        business_users.business_name AS business_name
       FROM invoices
       JOIN business_users ON invoices.business_user_id = business_users.id
       WHERE invoices.id = $1
