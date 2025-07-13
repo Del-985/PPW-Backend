@@ -262,9 +262,6 @@ const deleteInvoice = async (req, res) => {
 };
 
 
-const path = require('path');
-const PDFDocument = require('pdfkit');
-
 const generateInvoicePDF = async (req, res) => {
   try {
     const { id } = req.params;
