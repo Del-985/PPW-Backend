@@ -258,6 +258,47 @@ const deleteInvoice = async (req, res) => {
   }
 };
 
+const generateInvoicePDF = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT 
+        invoices.*,
+        business_users.name AS business_name
+      FROM invoices
+      JOIN business_users ON invoices.business_user_id = business_users.id
+      WHERE invoices.id = $1
+    `, [id]);
+    if (result.rowCount === 0) return res.status(404).send('Invoice not found');
+    const inv = result.rows[0];
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice_${inv.id}.pdf`);
+
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(res);
+
+    doc.fontSize(18).text('INVOICE', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(12).text(`Invoice #: ${inv.id}`);
+    doc.text(`Customer: ${inv.customer_name}`);
+    doc.text(`Business: ${inv.business_name}`);
+    doc.text(`Amount: $${Number(inv.amount).toFixed(2)}`);
+    doc.text(`Description: ${inv.description || 'N/A'}`);
+    doc.text(`Due Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
+    doc.text(`Service Date: ${inv.service_date ? new Date(inv.service_date).toLocaleDateString() : 'N/A'}`);
+    doc.text(`Paid: ${inv.paid ? 'Yes' : 'No'}`);
+    if (inv.paid && inv.paid_at) doc.text(`Paid At: ${new Date(inv.paid_at).toLocaleString()}`);
+
+    doc.end();
+  } catch (err) {
+    console.error('Error generating invoice PDF:', err);
+    res.status(500).send('Failed to generate PDF');
+  }
+};
+
+
 
 // ✅ Consolidated exports
 module.exports = {
@@ -272,5 +313,6 @@ module.exports = {
   createInvoice,
   getAllInvoices,
   markInvoicePaid,
-  deleteInvoice
+  deleteInvoice,
+  generateInvoicePDF
 };
