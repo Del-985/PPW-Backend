@@ -71,9 +71,35 @@ const handleContactForm = async (req, res) => {
       };
 
       await transporter.sendMail(mailOptions);
-      console.log('✅ Email sent');
+      console.log('✅ Email sent to admin');
     } catch (emailErr) {
-      console.error('❌ Email failed:', emailErr.stack || emailErr.message);
+      console.error('❌ Admin email failed:', emailErr.stack || emailErr.message);
+    }
+
+    // Send confirmation email to user
+    try {
+      const confirmOptions = {
+        from: `"Pioneer Pressure Washing" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Thank you for contacting Pioneer Pressure Washing!',
+        text: `Hi ${name},
+
+Thank you for reaching out to Pioneer Pressure Washing and Landscaping!
+We’ve received your message and will get back to you as soon as possible.
+
+If your inquiry is urgent, you can call us at (your business number here).
+
+Best regards,
+Pioneer Pressure Washing & Landscaping Team
+`,
+        // Optionally, add html: ... for fancier formatting.
+      };
+
+      await transporter.sendMail(confirmOptions);
+      console.log('✅ Confirmation email sent to user');
+    } catch (emailErr) {
+      console.error('❌ Confirmation email failed:', emailErr.stack || emailErr.message);
+      // Do not block the response if confirmation fails
     }
 
     res.status(200).json({ success: true, message: 'Message received and stored.' });
