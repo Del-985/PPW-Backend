@@ -218,6 +218,24 @@ const createInvoice = async (req, res) => {
   }
 };
 
+const getAllInvoices = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM invoices ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching invoices:', err);
+    res.status(500).json({ error: 'Failed to fetch invoices' });
+  }
+};
+
+// In your module.exports
+module.exports = {
+  // ...other functions,
+  getAllInvoices,
+  createInvoice,
+};
+
+
 // ✅ Consolidated exports
 module.exports = {
   getAllContacts,
