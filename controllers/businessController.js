@@ -198,6 +198,34 @@ const deleteScheduleEntry = async (req, res) => {
   }
 };
 
+const getMyInvoices = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const result = await pool.query(
+      'SELECT * FROM invoices WHERE business_user_id = $1 ORDER BY due_date DESC',
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching user invoices:', err);
+    res.status(500).json({ error: 'Failed to fetch invoices.' });
+  }
+};
+
+const getMySchedule = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const result = await pool.query(
+      'SELECT * FROM schedule WHERE business_user_id = $1 ORDER BY scheduled_date DESC',
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching user schedule:', err);
+    res.status(500).json({ error: 'Failed to fetch schedule.' });
+  }
+};
+
 module.exports = {
   registerBusinessUser,
   loginBusinessUser,
@@ -205,5 +233,7 @@ module.exports = {
   createScheduleEntry,
   getScheduleEntries,
   updateScheduleEntry,
-  deleteScheduleEntry
+  deleteScheduleEntry,
+  getMyInvoices,
+  getMySchedule
 };
