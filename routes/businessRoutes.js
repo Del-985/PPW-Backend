@@ -11,20 +11,18 @@ const {
   getScheduleEntries,
   updateScheduleEntry,
   deleteScheduleEntry,
-  getMyInvoices,     // <-- ADDED
-  getMySchedule,     // <-- ADDED
-  // generateMyInvoicePDF, // <-- Uncomment if you add PDF download
+  getMyInvoices,
+  getMySchedule,
+  // generateMyInvoicePDF,
 } = require('../controllers/businessController');
 
 const verifyToken = require('../middleware/auth');
 
 // 🚫 Brute-force protection for login
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 5,
-  message: {
-    error: 'Too many login attempts. Please try again in 15 minutes.'
-  },
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -42,9 +40,9 @@ router.delete('/schedule/:id', verifyToken, allowBusinessEdit, deleteScheduleEnt
 router.post('/schedule', verifyToken, createScheduleEntry);
 router.get('/schedule', verifyToken, getScheduleEntries);
 
-// --------- NEW: Dashboard APIs for Customer (Business User) ---------
-router.get('/me/invoices', verifyToken, getMyInvoices);    // See only own invoices
-router.get('/me/schedule', verifyToken, getMySchedule);    // See only own schedule
-// router.get('/me/invoice/:id/pdf', verifyToken, generateMyInvoicePDF); // PDF download (optional)
+// --------- NEW: Customer Dashboard APIs ---------
+router.get('/me/invoices', verifyToken, getMyInvoices);   // List logged-in user's invoices
+router.get('/me/schedule', verifyToken, getMySchedule);   // List logged-in user's schedule
+// router.get('/me/invoice/:id/pdf', verifyToken, generateMyInvoicePDF); // PDF download
 
 module.exports = router;
