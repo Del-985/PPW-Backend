@@ -13,7 +13,7 @@ const {
   deleteScheduleEntry,
   getMyInvoices,
   getMySchedule,
-  generateMyInvoicePDF,  // <-- PDF download for business user
+  generateMyInvoicePDF  // <-- PDF download for business user
 } = require('../controllers/businessController');
 
 const verifyToken = require('../middleware/auth');
