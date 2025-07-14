@@ -250,6 +250,7 @@ const getBusinessInvoices = async (req, res) => {
 
 // GET /api/business/me/invoice/:id/pdf
 const generateMyInvoicePDF = async (req, res) => {
+  console.log('generateMyInvoicePDF called with id:', req.params.id, 'user:', req.user);
   console.log('PDF route HIT', {
   userId: req.user?.userId,
   invoiceId: req.params.id
