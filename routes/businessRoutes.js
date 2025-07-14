@@ -13,7 +13,7 @@ const {
   deleteScheduleEntry,
   getMyInvoices,
   getMySchedule,
-  // generateMyInvoicePDF,
+  generateMyInvoicePDF,  // <-- PDF download for business user
 } = require('../controllers/businessController');
 
 const verifyToken = require('../middleware/auth');
@@ -43,6 +43,6 @@ router.get('/schedule', verifyToken, getScheduleEntries);
 // --------- NEW: Customer Dashboard APIs ---------
 router.get('/me/invoices', verifyToken, getMyInvoices);   // List logged-in user's invoices
 router.get('/me/schedule', verifyToken, getMySchedule);   // List logged-in user's schedule
-// router.get('/me/invoice/:id/pdf', verifyToken, generateMyInvoicePDF); // PDF download
+router.get('/me/invoice/:id/pdf', verifyToken, generateMyInvoicePDF); // PDF download
 
 module.exports = router;
