@@ -250,6 +250,10 @@ const getBusinessInvoices = async (req, res) => {
 
 // GET /api/business/me/invoice/:id/pdf
 const generateMyInvoicePDF = async (req, res) => {
+  console.log('PDF route HIT', {
+  userId: req.user?.userId,
+  invoiceId: req.params.id
+});
   try {
     const invoiceId = req.params.id;
     const userId = req.user?.userId; // JWT middleware sets this
