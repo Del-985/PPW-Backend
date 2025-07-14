@@ -1,4 +1,6 @@
 const pool = require('../config/db');
+const PDFDocument = require('pdfkit');
+const path = require('path')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
