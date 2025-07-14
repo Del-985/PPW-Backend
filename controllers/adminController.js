@@ -349,6 +349,68 @@ const generateInvoicePDF = async (req, res) => {
   }
 };
 
+// Get all expenses (optionally for a specific year)
+const getAllExpenses = async (req, res) => {
+  try {
+    const year = req.query.year;
+    let result;
+    if (year) {
+      result = await pool.query(
+        `SELECT * FROM expenses WHERE EXTRACT(YEAR FROM date) = $1 ORDER BY date DESC`,
+        [year]
+      );
+    } else {
+      result = await pool.query(`SELECT * FROM expenses ORDER BY date DESC`);
+    }
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching expenses:', err);
+    res.status(500).json({ error: 'Failed to load expenses.' });
+  }
+};
+
+// Create new expense
+const createExpense = async (req, res) => {
+  try {
+    const { date, category, description, amount } = req.body;
+    if (!date || !category || !amount) {
+      return res.status(400).json({ error: 'Date, category, and amount are required.' });
+    }
+    const result = await pool.query(
+      `INSERT INTO expenses (date, category, description, amount)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [date, category.trim(), description?.trim() || null, Number(amount)]
+    );
+    res.status(201).json({ success: true, expense: result.rows[0] });
+  } catch (err) {
+    console.error('Error creating expense:', err);
+    res.status(500).json({ error: 'Failed to create expense.' });
+  }
+};
+
+// Edit/update expense
+const updateExpense = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, category, description, amount } = req.body;
+    if (!id || !date || !category || !amount) {
+      return res.status(400).json({ error: 'ID, date, category, and amount are required.' });
+    }
+    const result = await pool.query(
+      `UPDATE expenses
+       SET date = $1, category = $2, description = $3, amount = $4
+       WHERE id = $5
+       RETURNING *`,
+      [date, category.trim(), description?.trim() || null, Number(amount), id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Expense not found.' });
+    res.json({ success: true, expense: result.rows[0] });
+  } catch (err) {
+    console.error('Error updating expense:', err);
+    res.status(500).json({ error: 'Failed to update expense.' });
+  }
+};
 
 
 
@@ -367,5 +429,8 @@ module.exports = {
   getAllInvoices,
   markInvoicePaid,
   deleteInvoice,
-  generateInvoicePDF
+  generateInvoicePDF,
+   getAllExpenses,
+  createExpense,
+  updateExpense
 };
