@@ -13,7 +13,11 @@ const {
   getAllInvoices,
   markInvoicePaid,
   deleteInvoice,
-  generateInvoicePDF
+  generateInvoicePDF,
+  // Add expense controllers here:
+  getAllExpenses,
+  createExpense,
+  updateExpense
 } = require('../controllers/adminController');
 
 const verifyToken = require('../middleware/auth');
@@ -38,12 +42,12 @@ router.patch('/schedule/:id/status', validateStatus, updateScheduleStatus); // s
 router.patch('/schedule/status/bulk', bulkUpdateScheduleStatus); // bulk status update
 router.patch('/invoice/:id/paid', markInvoicePaid); // Mark invoice as paid (PATCH)
 
-
-// Delete invoice (DELETE)
-router.delete('/invoice/:id', deleteInvoice);
-
-
 // Invoice creation
 router.post('/invoice', createInvoice);
+
+// EXPENSES ROUTES (NEW)
+router.get('/expenses', getAllExpenses);              // GET all expenses
+router.post('/expenses', createExpense);              // POST new expense
+router.patch('/expenses/:id', updateExpense);         // PATCH update expense
 
 module.exports = router;
