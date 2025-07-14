@@ -10,7 +10,10 @@ const {
   createScheduleEntry,
   getScheduleEntries,
   updateScheduleEntry,
-  deleteScheduleEntry
+  deleteScheduleEntry,
+  getMyInvoices,     // <-- ADDED
+  getMySchedule,     // <-- ADDED
+  // generateMyInvoicePDF, // <-- Uncomment if you add PDF download
 } = require('../controllers/businessController');
 
 const verifyToken = require('../middleware/auth');
@@ -38,5 +41,10 @@ router.patch('/schedule/:id', verifyToken, allowBusinessEdit, updateScheduleEntr
 router.delete('/schedule/:id', verifyToken, allowBusinessEdit, deleteScheduleEntry);
 router.post('/schedule', verifyToken, createScheduleEntry);
 router.get('/schedule', verifyToken, getScheduleEntries);
+
+// --------- NEW: Dashboard APIs for Customer (Business User) ---------
+router.get('/me/invoices', verifyToken, getMyInvoices);    // See only own invoices
+router.get('/me/schedule', verifyToken, getMySchedule);    // See only own schedule
+// router.get('/me/invoice/:id/pdf', verifyToken, generateMyInvoicePDF); // PDF download (optional)
 
 module.exports = router;
