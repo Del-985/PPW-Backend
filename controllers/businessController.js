@@ -248,6 +248,46 @@ const getBusinessInvoices = async (req, res) => {
   }
 };
 
+// GET /api/business/me/invoice/:id/pdf
+const generateMyInvoicePDF = async (req, res) => {
+  try {
+    const invoiceId = req.params.id;
+    const userId = req.user?.userId; // JWT middleware sets this
+
+    // Only allow access to *own* invoice
+    const { rows } = await pool.query(
+      `SELECT invoices.*, business_users.business_name
+       FROM invoices
+       JOIN business_users ON invoices.business_user_id = business_users.id
+       WHERE invoices.id = $1 AND invoices.business_user_id = $2`,
+      [invoiceId, userId]
+    );
+
+    if (!rows.length) return res.status(404).send('Invoice not found');
+
+    const inv = rows[0];
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice_${inv.id}.pdf`);
+
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(res);
+
+    // --- Minimal PDF layout (customize as you like!) ---
+    doc.fontSize(18).text('INVOICE', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12).text(`Invoice #: ${1000 + Number(inv.id)}`);
+    doc.text(`Customer: ${inv.customer_name}`);
+    doc.text(`Business: ${inv.business_name}`);
+    doc.text(`Amount: $${Number(inv.amount).toFixed(2)}`);
+    doc.text(`Due Date: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : 'N/A'}`);
+    doc.text(`Paid: ${inv.paid ? 'Yes' : 'No'}`);
+    doc.end();
+  } catch (err) {
+    console.error('Error generating customer invoice PDF:', err);
+    res.status(500).send('Failed to generate PDF');
+  }
+};
+
 module.exports = {
   registerBusinessUser,
   loginBusinessUser,
@@ -258,5 +298,6 @@ module.exports = {
   deleteScheduleEntry,
   getMyInvoices,
   getMySchedule,
-  getBusinessInvoices
+  getBusinessInvoices,
+  generateMyInvoicePDF
 };
