@@ -226,6 +226,26 @@ const getMySchedule = async (req, res) => {
   }
 };
 
+// Get all invoices for the logged-in business user
+const getBusinessInvoices = async (req, res) => {
+  try {
+    const businessUserId = req.user?.userId; // Provided by JWT middleware
+    if (!businessUserId) return res.status(403).json({ error: "Not authorized" });
+
+    const result = await pool.query(
+      `SELECT id, customer_name, amount, due_date, description, paid, service_date
+       FROM invoices
+       WHERE business_user_id = $1
+       ORDER BY due_date DESC, id DESC`,
+      [businessUserId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching business invoices:", err);
+    res.status(500).json({ error: "Failed to fetch invoices." });
+  }
+};
+
 module.exports = {
   registerBusinessUser,
   loginBusinessUser,
@@ -235,5 +255,6 @@ module.exports = {
   updateScheduleEntry,
   deleteScheduleEntry,
   getMyInvoices,
-  getMySchedule
+  getMySchedule,
+  getBusinessInvoices
 };
