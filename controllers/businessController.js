@@ -63,7 +63,8 @@ const loginBusinessUser = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: 'None',
-      maxAge: 1000 * 60 * 60 * 24 * 2
+      maxAge: 1000 * 60 * 60 * 24 * 2,
+      path: '/'
     });
 
     res.status(200).json({ success: true, message: 'Login successful.', is_admin: user.is_admin });
