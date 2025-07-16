@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const verifyToken = (req, res, next) => {
   console.log(`[${new Date().toISOString()}] verifyToken called for ${req.method} ${req.originalUrl}`);
 
+  // Get JWT from httpOnly cookie
   const token = req.cookies?.token;
 
   if (!token) {
@@ -11,20 +12,21 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
+    // Verify and decode JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('Decoded JWT:', decoded);
 
-    // ✅ Require a valid userId
+    // Must have a numeric userId
     if (!decoded || typeof decoded.userId !== 'number') {
       console.warn('Invalid token payload:', decoded);
       return res.status(403).json({ error: 'Invalid token payload.' });
     }
 
-    // ✅ Use is_admin flag to assign role
+    // Attach user info to request for downstream routes
     req.user = {
-      role: decoded.is_admin ? 'admin' : 'business',
       userId: decoded.userId,
-      is_admin: decoded.is_admin
+      is_admin: !!decoded.is_admin,         // Boolean
+      role: decoded.is_admin ? 'admin' : 'business'
     };
 
     console.log('User set in request:', req.user);
