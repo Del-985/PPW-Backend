@@ -86,8 +86,18 @@ const loginBusinessUser = async (req, res) => {
 
 };
 
+const logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    path: '/',
+  });
+  res.json({ success: true });
+};
 
 module.exports = {
 registerBusinessUser,
-  loginBusinessUser
+  loginBusinessUser,
+  logout
 };
