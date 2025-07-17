@@ -59,6 +59,15 @@ const loginBusinessUser = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
     );
 
+    console.log('Setting cookie (in prod) with options:', {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'None',
+  path: '/',
+  maxAge: ...
+});
+
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: true,
