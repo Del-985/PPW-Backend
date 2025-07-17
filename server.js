@@ -26,6 +26,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const loginRoutes = require('./routes/loginRoutes');
+const quoteRoutes = require('./routes/quoteRoutes');
 
 
 app.use('/api', require('./routes/generalRoutes'));
@@ -33,6 +34,7 @@ app.use('/api/auth', loginRoutes);
 app.use('/api', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/business', businessRoutes);
+app.use('/api/quotes', quoteRoutes);
 
 // 404 Handler
 app.use((req, res) => {
