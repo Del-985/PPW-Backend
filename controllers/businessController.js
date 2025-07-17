@@ -64,7 +64,7 @@ const loginBusinessUser = async (req, res) => {
   secure: true,
   sameSite: 'None',
   path: '/',
-  maxAge: ...
+  maxAge: 1000 * 60 * 60 *24 *2
 });
 
 
