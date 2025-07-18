@@ -1,6 +1,6 @@
 // controllers/quoteController.js
+const pool = require('../config/db.js');
 const nodemailer = require('nodemailer');
-const pool = new Pool(); // Uses your DATABASE_URL or .env config
 
 exports.handleCommercialQuote = async (req, res) => {
   try {
