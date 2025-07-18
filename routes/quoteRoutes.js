@@ -6,6 +6,9 @@ const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
+const quoteController = require('../controllers/quoteController');
+// (Adjust the path if needed)
+
 
 // File upload config (for optional site photo)
 const upload = multer({ dest: 'uploads/' }); // Save in /uploads
