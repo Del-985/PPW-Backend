@@ -2,7 +2,7 @@
 const pool = require('../config/db');
 const nodemailer = require('nodemailer');
 
-async function handleCommercialQuote = async (req, res) => {
+async function handleCommercialQuote(req, res) {
   try {
     const {
       business,
