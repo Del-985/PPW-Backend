@@ -45,36 +45,7 @@ async function handleCommercialQuote(req, res) {
       attachments.push({ path: req.file.path });
     }
 
-    await transporter.sendMail({
-      from: '"Pioneer Wash" <admin@pioneerwashandlandscape.com>',
-      to: 'admin@pioneerwashandlandscape.com', // your receiving email
-      subject: `New Commercial Quote: ${business}`,
-      text:
-`Business: ${business}
-Contact: ${contact}
-Email: ${email}
-Phone: ${phone}
-Address: ${address}, ${city}
-Type: ${serviceType}
-Locations: ${locations}
-Sq Ft/Area: ${sqft}
-Services Needed: ${services}
-
-Notes: ${notes || 'N/A'}
-File: ${attachment_url || 'None'}
-
-Submitted: ${new Date().toLocaleString()}
-`,
-      attachments
-    });
-
-    // Optional: Send confirmation to client
-    // await transporter.sendMail({
-    //   from: '"Pioneer Wash" <admin@pioneerwashandlandscape.com>',
-    //   to: email,
-    //   subject: "We've received your quote request!",
-    //   text: "Thank you for reaching out to Pioneer Pressure Washing and Landscaping. We’ll get in touch soon."
-    // });
+   
 
     return res.json({ success: true, message: "Quote received!" });
   } catch (err) {
