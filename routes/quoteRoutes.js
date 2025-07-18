@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const pool = require('../db');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
