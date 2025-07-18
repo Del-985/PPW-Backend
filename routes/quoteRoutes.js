@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { Pool } = require('pg');
+const pool = require('pg');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
