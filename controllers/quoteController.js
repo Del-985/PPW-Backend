@@ -1,5 +1,5 @@
 // controllers/quoteController.js
-const pool = require('../config/db.js');
+const pool = require('../config/db');
 const nodemailer = require('nodemailer');
 
 exports.handleCommercialQuote = async (req, res) => {
