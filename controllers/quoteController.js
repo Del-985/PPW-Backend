@@ -2,7 +2,7 @@
 const pool = require('../config/db');
 const nodemailer = require('nodemailer');
 
-exports.handleCommercialQuote = async (req, res) => {
+async function handleCommercialQuote = async (req, res) => {
   try {
     const {
       business,
@@ -81,4 +81,8 @@ Submitted: ${new Date().toLocaleString()}
     console.error(err);
     res.status(500).json({ success: false, message: "Submission failed." });
   }
+};
+
+module.exports = {
+  handleCommercialQuote
 };
