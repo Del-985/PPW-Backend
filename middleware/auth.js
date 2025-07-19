@@ -3,8 +3,9 @@ const jwt = require('jsonwebtoken');
 const verifyToken = (req, res, next) => {
   console.log(`[${new Date().toISOString()}] verifyToken called for ${req.method} ${req.originalUrl}`);
 
-  // Get JWT from httpOnly cookie
-  const token = req.cookies?.token;
+  // Get JWT from Authorization header: "Bearer <token>"
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Extract after 'Bearer '
 
   if (!token) {
     console.warn('Access denied: No token provided');
@@ -25,7 +26,7 @@ const verifyToken = (req, res, next) => {
     // Attach user info to request for downstream routes
     req.user = {
       userId: decoded.userId,
-      is_admin: !!decoded.is_admin,         // Boolean
+      is_admin: !!decoded.is_admin,
       role: decoded.is_admin ? 'admin' : 'business'
     };
 
