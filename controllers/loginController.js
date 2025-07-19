@@ -22,6 +22,7 @@ const registerBusinessUser = async (req, res) => {
 };
 
 // Login Business User (handles admin via is_admin)
+// Login Business User (Token in JSON Response, no cookie!)
 const loginBusinessUser = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'All fields are required.' });
@@ -42,31 +43,23 @@ const loginBusinessUser = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '2d' }
     );
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None',
-      maxAge: 1000 * 60 * 60 * 24 * 2,
-      path: '/'
+    // **NO COOKIE SET!** Instead, return the token in the response body
+    res.status(200).json({
+      success: true,
+      token,                      // <-- token is sent to client!
+      is_admin: user.is_admin
     });
-    res.status(200).json({ success: true, is_admin: user.is_admin });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Internal server error.' });
   }
 };
 
-// Logout (universal)
+// Logout (stateless, just a client-side action now)
 const logout = (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'None',
-    path: '/'
-  });
-  res.json({ success: true });
+  // Just inform the frontend to delete the token from storage
+  res.json({ success: true, message: 'Logged out (token deleted client-side).' });
 };
-
 module.exports = {
   registerBusinessUser,
   loginBusinessUser,
