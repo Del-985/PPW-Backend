@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const PDFDocument = require('pdfkit');
 require('dotenv').config();
 
@@ -14,12 +13,11 @@ app.use(cors({
   origin: [
     'https://pioneerwashandlandscape.com',
     'https://www.pioneerwashandlandscape.com'
-  ],
-  credentials: true
+  ]
+  // credentials: true   // Removed, not needed for header auth!
 }));
 
 app.use(express.json());
-app.use(cookieParser());
 
 // Routes
 const contactRoutes = require('./routes/contactRoutes');
@@ -27,7 +25,6 @@ const adminRoutes = require('./routes/adminRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const loginRoutes = require('./routes/loginRoutes');
 const quoteRoutes = require('./routes/quoteRoutes');
-
 
 app.use('/api', require('./routes/generalRoutes'));
 app.use('/api/auth', loginRoutes);
