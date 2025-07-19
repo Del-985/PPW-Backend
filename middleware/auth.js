@@ -25,7 +25,8 @@ const verifyToken = (req, res, next) => {
 
     // Attach user info to request for downstream routes
     req.user = {
-      userId: decoded.userId,
+      id: decoded.userId,                    // <-- set as 'id' for consistency
+      email: decoded.email || null,          // <-- set email if present
       is_admin: !!decoded.is_admin,
       role: decoded.is_admin ? 'admin' : 'business'
     };
