@@ -23,10 +23,11 @@ const verifyToken = (req, res, next) => {
       return res.status(403).json({ error: 'Invalid token payload.' });
     }
 
-    // Attach user info to request for downstream routes
+    // Attach user info to request for downstream routes (with both id and userId fields)
     req.user = {
-      id: decoded.userId,                    // <-- set as 'id' for consistency
-      email: decoded.email || null,          // <-- set email if present
+      id: decoded.userId,
+      userId: decoded.userId,          // <--- Legacy support for existing code!
+      email: decoded.email || null,
       is_admin: !!decoded.is_admin,
       role: decoded.is_admin ? 'admin' : 'business'
     };
